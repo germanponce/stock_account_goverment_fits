@@ -114,21 +114,21 @@ class AccountMove(models.Model):
 
     def get_no_identificacion_for_cfdi(self, invoiceline):
         no_identificacion = invoiceline.product_id.default_code
-        if record.partner_id.x_studio_es_gobierno:
+        if self.partner_id.x_studio_es_gobierno:
             if invoiceline.product_id.x_studio_clave_gobierno:
                 no_identificacion = invoiceline.product_id.x_studio_clave_gobierno.x_name
         return no_identificacion
 
     def get_description_for_cfdi(self, invoiceline):
         line_description = invoiceline.name
-        if record.partner_id.x_studio_es_gobierno:
+        if self.partner_id.x_studio_es_gobierno:
             if invoiceline.product_id.x_studio_clave_gobierno:
                 line_description = invoiceline.product_id.x_studio_clave_gobierno.x_studio_descrip_gobierno
         return line_description
 
     def get_unidad_for_cfdi(self, invoiceline):
         uom_description = invoiceline.product_uom_id.name
-        if record.partner_id.x_studio_es_gobierno:
+        if self.partner_id.x_studio_es_gobierno:
             if invoiceline.product_id.x_studio_clave_gobierno:
                 uom_description = invoiceline.product_id.x_studio_clave_gobierno.x_studio_unidad_gobierno
         return uom_description
