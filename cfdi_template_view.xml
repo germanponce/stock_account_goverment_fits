@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="cfdi_goberment_extend" inherit_id="l10n_mx_edi.cfdiv33">
+        <xpath expr="//*[name()='cfdi:Concepto']" position="replace">
+            <cfdi:Concepto
+                        xmlns:cfdi="http://www.sat.gob.mx/cfd/3"  
+                        t-att-ClaveProdServ="line.product_id.unspsc_code_id.code"
+                        t-att-NoIdentificacion="format_string(record.get_no_identificacion_for_cfdi(line))"
+                        t-att-Cantidad="format_float(line.quantity, 6)"
+                        t-att-ClaveUnidad="line.product_uom_id.unspsc_code_id.code"
+                        t-att-Unidad="format_string(record.get_unidad_for_cfdi(line), 20)"
+                        t-att-Descripcion="format_string(record.get_description_for_cfdi(line), 1000)"
+                        t-att-ValorUnitario="format_float(line.price_unit, currency_precision)"
+                        t-att-Importe="format_float(line_vals['price_subtotal_before_discount'], currency_precision)"
+                        t-att-Descuento="format_float(line_vals['price_discount'], currency_precision) if line_vals['price_discount'] else None">
+                        <t t-set="tax_detail_transferred" t-value="tax_details_transferred['invoice_line_tax_details'][line]"/>
+                        <t t-set="tax_detail_withholding" t-value="tax_details_withholding['invoice_line_tax_details'][line]"/>
+                        <t t-if="tax_detail_transferred['tax_details'] or tax_detail_withholding['tax_details']">
+                            <cfdi:Impuestos>
+                                <t t-if="tax_detail_transferred['tax_details']">
+                                    <cfdi:Traslados>
+                                        <t t-foreach="tax_detail_transferred['tax_details'].values()" t-as="tax_detail_vals">
+                                            <t t-set="tax" t-value="tax_detail_vals['tax']"/>
+                                            <cfdi:Traslado
+                                                t-att-Base="format_float(balance_multiplicator * tax_detail_vals['base_amount_currency'], currency_precision)"
+                                                t-att-Impuesto="get_tax_cfdi_name(tax_detail_vals)"
+                                                t-att-TipoFactor="tax.l10n_mx_tax_type"
+                                                t-att-TasaOCuota="format_float(tax.amount / 100.0, 6)"
+                                                t-att-Importe="format_float(balance_multiplicator * tax_detail_vals['tax_amount_currency'], 2)"/>
+                                        </t>
+                                    </cfdi:Traslados>
+                                </t>
+                                <t t-if="tax_detail_withholding['tax_details']">
+                                    <cfdi:Retenciones>
+                                        <t t-foreach="tax_detail_withholding['tax_details'].values()" t-as="tax_detail_vals">
+                                            <t t-set="tax" t-value="tax_detail_vals['tax']"/>
+                                            <cfdi:Retencion
+                                                t-att-Base="format_float(balance_multiplicator * tax_detail_vals['base_amount_currency'], currency_precision)"
+                                                t-att-Impuesto="get_tax_cfdi_name(tax_detail_vals)"
+                                                t-att-TipoFactor="tax.l10n_mx_tax_type"
+                                                t-att-TasaOCuota="format_float(-tax.amount / 100.0, 6)"
+                                                t-att-Importe="format_float(-balance_multiplicator * tax_detail_vals['tax_amount_currency'], 2)"/>
+                                        </t>
+                                    </cfdi:Retenciones>
+                                </t>
+                            </cfdi:Impuestos>
+                        </t>
+                    </cfdi:Concepto>
+        </xpath>
+        
+        
+    </template>
+
+</odoo>
