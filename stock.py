@@ -123,7 +123,7 @@ class AccountMove(models.Model):
         line_description = invoiceline.name
         if self.partner_id.x_studio_es_gobierno:
             if invoiceline.product_id.x_studio_clave_gobierno:
-                line_description = invoiceline.product_id.x_studio_clave_gobierno.x_studio_descrip_gobierno
+                line_description = invoiceline.product_id.x_studio_clave_gobierno.x_studio_desc_gobierno
         return line_description
 
     def get_unidad_for_cfdi(self, invoiceline):
