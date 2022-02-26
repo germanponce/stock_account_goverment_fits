@@ -23,7 +23,7 @@
                                 <t t-esc="snln_line['uom_name']" groups="uom.group_uom"/>
                             </td>
                             <td class="text-right"><t t-esc="snln_line['lot_name']"/></td>
-                            <td class="text-right"><t t-esc="snln_line['expiration_date'] if 'expiration_date' in vals else ''"/></td>
+                            <td class="text-right"><t t-esc="snln_line['expiration_date'] if 'expiration_date' in snln_line else ''"/></td>
                         </tr>
                     </t>
                 </tbody>

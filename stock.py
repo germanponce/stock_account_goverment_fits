@@ -34,9 +34,7 @@ class AccountMove(models.Model):
     def _get_invoiced_lot_values(self):
         """ Get and prepare data to show a table of invoiced lot on the invoice's report. """
         self.ensure_one()
-
-        res = super(AccountMove, self)._get_invoiced_lot_values()
-
+        
         if self.state == 'draft':
             return res
 
