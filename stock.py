@@ -34,7 +34,7 @@ class AccountMove(models.Model):
     def _get_invoiced_lot_values(self):
         """ Get and prepare data to show a table of invoiced lot on the invoice's report. """
         self.ensure_one()
-        
+
         if self.state == 'draft':
             return res
 
@@ -95,7 +95,7 @@ class AccountMove(models.Model):
                 qties_per_lot[ml.lot_id] += ml.product_uom_id._compute_quantity(ml.qty_done, ml.product_id.uom_id)
             for ml in incoming_sml:
                 qties_per_lot[ml.lot_id] -= ml.product_uom_id._compute_quantity(ml.qty_done, ml.product_id.uom_id)
-        lot_values = res
+        lot_values = []
         for lot_id, qty in qties_per_lot.items():
             if float_is_zero(qty, precision_rounding=lot_id.product_id.uom_id.rounding):
                 continue
