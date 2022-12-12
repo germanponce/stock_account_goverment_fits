@@ -101,8 +101,8 @@ class AccountMove(models.Model):
                 continue
             expiration_date_res = ""
             if lot_id.expiration_date:
-                expiration_date = lot_id.expiration_date 
-                expiration_date_spl = expiration_date.split('-')
+                expiration_date = str(lot_id.expiration_date) 
+                expiration_date_spl = expiration_date[0:10].split('-')
                 expiration_date_res = expiration_date_spl[2]+'/'+expiration_date_spl[1]++'/'+expiration_date_spl[0]
             lot_values.append({
                 'product_name': lot_id.product_id.display_name,
