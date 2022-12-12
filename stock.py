@@ -99,6 +99,11 @@ class AccountMove(models.Model):
         for lot_id, qty in qties_per_lot.items():
             if float_is_zero(qty, precision_rounding=lot_id.product_id.uom_id.rounding):
                 continue
+            expiration_date_res = ""
+            if lot_id.expiration_date:
+                expiration_date = lot_id.expiration_date 
+                expiration_date_spl = expiration_date.split('-')
+                expiration_date_res = expiration_date_spl[2]+'/'+expiration_date_spl[1]++'/'+expiration_date_spl[0]
             lot_values.append({
                 'product_name': lot_id.product_id.display_name,
                 'quantity': qty,
@@ -106,7 +111,7 @@ class AccountMove(models.Model):
                 'lot_name': lot_id.name,
                 # The lot id is needed by localizations to inherit the method and add custom fields on the invoice's report.
                 'lot_id': lot_id.id,
-                'expiration_date': lot_id.expiration_date if lot_id.expiration_date else False,
+                'expiration_date': expiration_date_res,
             })
         return lot_values
 
