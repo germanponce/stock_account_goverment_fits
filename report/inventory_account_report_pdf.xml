@@ -33,6 +33,78 @@
        
     <!-- QWeb Reports -->
     <template id="report_invoice_document_columns_goberment" inherit_id="account.report_invoice_document">
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="sale_id" t-value="o.mapped('invoice_line_ids.sale_line_ids.order_id') or False"/>
+            <t t-if="o.partner_id.x_studio_es_gobierno">
+                <t t-if="sale_id">
+                    <t t-if="sale_id.partner_shipping_id != o.partner_id">
+                        <table class="table table-condensed">
+                            <tr>
+                                <td>
+                                    <span><strong>Dirección de Factura</strong></span>
+                                    <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                    <div t-if="o.partner_id.vat" class="mt16">
+                                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                        <t t-else="">RFC</t>: <span t-field="o.partner_id.vat"/></div>
+                                </td>
+                                <td>
+                                    <span><strong>Dirección de Entrega</strong></span>
+                                    <address t-field="sale_id.partner_shipping_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                    <div t-if="sale_id.partner_shipping_id.vat" class="mt16">
+                                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                        <t t-else="">RFC</t>: <span t-field="sale_id.partner_shipping_id.vat"/></div>
+                                </td>
+                            </tr>
+                        </table>            
+                    </t>
+                    <t t-else="">
+                        <t t-set="address">
+                            <span><strong>Dirección de Factura</strong></span>
+                            <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                            <div t-if="o.partner_id.vat" class="mt16">
+                                <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                                <t t-else="">RFC</t>: <span t-field="o.partner_id.vat"/></div>
+                        </t>
+                    </t>
+                </t>
+                <t t-else="">
+                    <t t-set="address">
+                        <span><strong>Dirección de Factura</strong></span>
+                        <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                        <div t-if="o.partner_id.vat" class="mt16">
+                            <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                            <t t-else="">RFC</t>: <span t-field="o.partner_id.vat"/></div>
+                    </t>
+                </t>
+            </t>
+            <t t-else="">
+                <t t-set="address">
+                    <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                    <div t-if="o.partner_id.vat" class="mt16">
+                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                        <t t-else="">RFC</t>: <span t-field="o.partner_id.vat"/></div>
+                </t>
+            </t>
+
+            <!-- <t t-set="address">
+                <span><strong>Dirección de Factura</strong></span>
+                <address t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                <div t-if="o.partner_id.vat" class="mt16">
+                    <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                    <t t-else="">RFC</t>: <span t-field="o.partner_id.vat"/></div>
+            </t>
+            <t t-set="address2" t-if="sale_id">
+                <t t-if="sale_id.partner_shipping_id != o.partner_id">
+                    <span><strong>Dirección de Entrega</strong></span>
+                    <address t-field="sale_id.partner_shipping_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                    <div t-if="sale_id.partner_shipping_id.vat" class="mt16">
+                        <t t-if="o.company_id.account_fiscal_country_id.vat_label" t-esc="o.company_id.account_fiscal_country_id.vat_label" id="inv_tax_id_label"/>
+                        <t t-else="">RFC</t>: <span t-field="sale_id.partner_shipping_id.vat"/></div>
+                </t>
+                
+            </t> -->
+        </xpath>
+        
         <!-- Add new column on invoice lines: Product Code -->
         <xpath expr="//table[@name='invoice_line_table']/thead/tr/th[2]" position="after">
             <th t-if="o.partner_id.x_studio_es_gobierno">
