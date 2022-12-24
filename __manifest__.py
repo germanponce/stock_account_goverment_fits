@@ -29,9 +29,10 @@
     "support": "german.ponce@outlook.com",
     'depends': ['base','stock','stock_account','l10n_mx_edi'],
     'update_xml': [
-        # 'stock_view.xml',
+        'account_view.xml',
         'report/inventory_account_report_pdf.xml',
         'cfdi_template_view.xml',
+        'security/ir.model.access.csv'
         ],
     'installable': True,
 }

@@ -28,12 +28,61 @@ from odoo.tools import float_is_zero
 import logging
 _logger = logging.getLogger(__name__)
 
+class AccountMoveReturnLot(models.Model):
+    _name = 'account.move.return.lot'
+    _description = 'Lotes Devolucion'
+    
+    product_id = fields.Many2one('product.product', 'Producto')
+
+    lot_id = fields.Many2one('stock.production.lot', 'Lote')
+
+    quantity = fields.Float('Cantidad')
+
+    uom_id = fields.Many2one('uom.uom', 'UdM')
+
+    name = fields.Char('Nombre', size=128, related="lot_id.name", store=True)
+
+    move_id = fields.Many2one('account.move', 'Factura')
+    
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if self.product_id:
+            if not self.uom_id:
+                self.uom_id = self.product_id.uom_id.id
+    
 class AccountMove(models.Model):
     _inherit ='account.move'
+
+
+    invoice_origin_id = fields.Many2one('account.move', 'Factura Origen')
+
+    products_in_lots_ids = fields.One2many('account.move.return.lot', 'move_id', 'Lotes Devolucion')
 
     def _get_invoiced_lot_values(self):
         """ Get and prepare data to show a table of invoiced lot on the invoice's report. """
         self.ensure_one()
+
+        if self.products_in_lots_ids:
+            lot_values = []
+            for lot in self.products_in_lots_ids:
+                lot_id = lot.lot_id
+                expiration_date_res = ""
+                if lot_id.expiration_date:
+                    expiration_date = str(lot_id.expiration_date) 
+                    expiration_date_spl = expiration_date[0:10].split('-')
+                    expiration_date_res = expiration_date_spl[2]+'/'+expiration_date_spl[1]+'/'+expiration_date_spl[0]
+                lot_values.append({
+                    'product_name': lot_id.product_id.display_name,
+                    'quantity': lot.quantity,
+                    'uom_name': lot.uom_id.name,
+                    'lot_name': lot_id.name,
+                    # The lot id is needed by localizations to inherit the method and add custom fields on the invoice's report.
+                    'lot_id': lot_id.id,
+                    'expiration_date': expiration_date_res,
+                })
+            return lot_values
+
 
         if self.state == 'draft':
             return res
@@ -135,3 +184,14 @@ class AccountMove(models.Model):
             if invoiceline.product_id.x_studio_clave_gobierno.x_studio_unidad_gob:
                 uom_description = invoiceline.product_id.x_studio_clave_gobierno.x_studio_unidad_gob    
         return uom_description
+
+
+class AccountMoveReversal(models.TransientModel):
+    _inherit ='account.move.reversal'
+
+
+    def reverse_moves(self):
+        res = super(AccountMoveReversal, self).reverse_moves()
+        for move in self.new_move_ids:
+            move.invoice_origin_id = self.move_ids[0].id if self.move_ids else False
+        return res
